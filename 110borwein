@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+
+import sys
+import math
+import os
+import random
+
+def help_opt():
+    print("USAGE")
+    print("    ./110borwein n\n")
+    print("DESCRIPTION")
+    print("    n   constant defining the integral to be computed");
+
+def string(string):
+    i = 0
+    while (i < len(string)):
+        if (string[i] != '-' and (string[i] < '0' or string[i] > '9')):
+            sys.stdout.write("Invalid argument\n")
+            exit(84)
+        i += 1
+
+def midpoint(x):
+    result = 0.0
+    b = 5000
+    a = 0
+    n = 10000
+    h = (b - a) / n
+    while (a < 10000):
+        result += summer(x, a * h)
+        a += 1
+    result *= h
+    return (result)
+
+def trapezoidal(x):
+    result = 0.0
+    b = 5000
+    n = 10000
+    h = b / n
+    a = 1
+    while (a < 10000):
+        result += summer(x, a * h)
+        a += 1
+    result *= 2
+    result += summer(x, 5000)
+    result += summer(x, 0)
+    result *= (h / 2)
+    return (result)
+
+def simpson(x):
+    res = 0.0
+    ult = 0.0
+    b = 5000
+    n = 10000
+    h = b / n
+    a = 1
+    while (a < 10000):
+        res += summer(x, a * h)
+        a += 1
+    a = 0
+    while (a < 10000):
+        ult += summer(x, (a * h) + (h / 2))
+        a += 1
+    result = summer(x, 5000) + summer(x, 0) + (2 * res) + (4 * ult)
+    result *= (b / (6 * n))
+    return (result)
+
+def summer(x, i):
+    result = 1.0
+    a = 0
+    while (a <= x):
+        if (i != 0):
+            result *= (math.sin(i / (2 * a + 1)) / (i / (2 * a + 1)))
+        a += 1
+    return (result)
+
+if (len(sys.argv) == 2):
+    if (sys.argv[1] == "-h"):
+        help_opt()
+        exit(0)
+
+    if (sys.argv[1].isdigit() == True):
+        x = float(sys.argv[1])
+        result = midpoint(x)
+        print(str("Midpoint:\nI" + str(int(x)) + " = " + "%.10f" % result))
+        if (str("%.10f" % (result - (math.pi / 2))) == "-0.0000000000"):
+            print(str("diff = " + "%.10f" % (-1 * (result - (math.pi / 2))) + "\n"))
+        else:
+            print(str("diff = " + "%.10f" % (result - (math.pi / 2)) + "\n"))
+        result = trapezoidal(x)
+        print(str("Trapezoidal:\nI" + str(int(x)) + " = " + "%.10f" % result))
+        if (str("%.10f" % (result - (math.pi / 2))) == "-0.0000000000"):
+            print(str("diff = " + "%.10f" % ((result - (math.pi / 2))) + "\n"))
+        else:
+            print(str("diff = " + "%.10f" % (-1 * (result - (math.pi / 2))) + "\n"))
+        result = simpson(x)
+        print(str("Simpson:\nI" + str(int(x)) + " = " + "%.10f" % result))
+        if (str("%.10f" % (result - (math.pi / 2))) == "-0.0000000000"):
+            print(str("diff = " + "%.10f" % (result - (math.pi / 2))))
+        else:
+            print(str("diff = " + "%.10f" % (-1 * (result - (math.pi / 2)))))
+    else:
+        sys.stdout.write("Not an integer number\n")
+        exit(84)
+
+else:
+    sys.stdout.write("Invalid number of argument\n")
+    exit(84)
